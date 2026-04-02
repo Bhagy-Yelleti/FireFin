@@ -1,17 +1,20 @@
 import React from 'react';
-import { Download, Search } from 'lucide-react';
+import { Download, Plus, Search } from 'lucide-react';
 import { useTransactionStore } from '../../store/transactionStore';
+import { useUiStore } from '../../store/uiStore';
 import { CATEGORIES } from '../../utils/constants';
 import Button from '../common/Button';
 
 const fieldClassName =
-  'w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-900 shadow-sm transition-all duration-200 placeholder:text-slate-500 hover:border-slate-300 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder:text-slate-400 dark:hover:border-slate-500';
+  'w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-900 shadow-sm transition-all duration-300 placeholder:text-slate-500 hover:-translate-y-px hover:border-slate-300 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder:text-slate-400 dark:hover:border-slate-500';
 
 export default function TransactionHeader() {
   const setSearchQuery = useTransactionStore((state) => state.setSearchQuery);
   const setFilterCategory = useTransactionStore((state) => state.setFilterCategory);
   const setSortBy = useTransactionStore((state) => state.setSortBy);
   const transactions = useTransactionStore((state) => state.transactions);
+  const role = useUiStore((state) => state.role);
+  const openAddTransaction = useUiStore((state) => state.openAddTransaction);
 
   const handleExportCSV = () => {
     if (transactions.length === 0) {
@@ -40,13 +43,26 @@ export default function TransactionHeader() {
 
   return (
     <div className="animate-fadeIn space-y-6">
-      <div>
-        <h2 className="mb-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
-          Transactions
-        </h2>
-        <p className="text-base text-slate-700 dark:text-slate-300">
-          Manage and review every transaction with filters, search, and exports.
-        </p>
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <h2 className="mb-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+            Transactions
+          </h2>
+          <p className="max-w-2xl text-base text-slate-700 dark:text-slate-300">
+            Search, manage, and export your latest activity with role-aware controls.
+          </p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3">
+          <Button onClick={handleExportCSV} variant="secondary" icon={<Download size={18} />}>
+            Export CSV
+          </Button>
+          {role === 'admin' && (
+            <Button onClick={openAddTransaction} variant="primary" icon={<Plus size={18} />}>
+              Add Transaction
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-4">
@@ -88,12 +104,6 @@ export default function TransactionHeader() {
           <option value="amount-high">Highest Amount</option>
           <option value="amount-low">Lowest Amount</option>
         </select>
-      </div>
-
-      <div className="flex justify-end">
-        <Button onClick={handleExportCSV} variant="secondary" icon={<Download size={18} />}>
-          Export CSV
-        </Button>
       </div>
     </div>
   );

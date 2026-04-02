@@ -3,6 +3,7 @@ import { Edit2, Trash2 } from 'lucide-react';
 import Card from '../common/Card';
 import Badge from '../common/Badge';
 import { useFilteredTransactions, useTransactionActions, useUserRole } from '../../hooks/useTransactions';
+import { useUiStore } from '../../store/uiStore';
 import { formatCurrency } from '../../utils/formatters';
 import { formatTransactionDate } from '../../utils/transactionHelpers';
 import { getTransactionTypeVariant } from '../../utils/uiHelpers';
@@ -12,13 +13,14 @@ export default function TransactionTable() {
   const { filtered } = useFilteredTransactions();
   const { isAdmin } = useUserRole();
   const { deleteTransaction } = useTransactionActions();
+  const openEditTransaction = useUiStore((state) => state.openEditTransaction);
 
   if (filtered.length === 0) {
     return (
       <Card className="animate-fadeIn">
         <EmptyState
           title="No transactions found"
-          description="Try adjusting your filters or search terms."
+          description="Try adjusting search or filters."
         />
       </Card>
     );
@@ -27,9 +29,14 @@ export default function TransactionTable() {
   return (
     <Card className="animate-fadeIn overflow-hidden p-0">
       <div className="overflow-x-auto">
-        <table className="min-w-full">
+        <table className="min-w-[760px] w-full">
           <TableHead isAdmin={isAdmin} />
-          <TableBody transactions={filtered} isAdmin={isAdmin} onDelete={deleteTransaction} />
+          <TableBody
+            transactions={filtered}
+            isAdmin={isAdmin}
+            onDelete={deleteTransaction}
+            onEdit={openEditTransaction}
+          />
         </table>
       </div>
     </Card>
@@ -66,7 +73,7 @@ function TableHead({ isAdmin }) {
   );
 }
 
-function TableBody({ transactions, isAdmin, onDelete }) {
+function TableBody({ transactions, isAdmin, onDelete, onEdit }) {
   return (
     <tbody className="divide-y divide-slate-100 dark:divide-slate-700/50">
       {transactions.map((transaction, idx) => (
@@ -75,6 +82,7 @@ function TableBody({ transactions, isAdmin, onDelete }) {
           transaction={transaction}
           isAdmin={isAdmin}
           onDelete={onDelete}
+          onEdit={onEdit}
           delay={idx * 0.05}
         />
       ))}
@@ -82,12 +90,12 @@ function TableBody({ transactions, isAdmin, onDelete }) {
   );
 }
 
-function TransactionRow({ transaction, isAdmin, onDelete, delay }) {
+function TransactionRow({ transaction, isAdmin, onDelete, onEdit, delay }) {
   const variant = getTransactionTypeVariant(transaction.type);
 
   return (
     <tr
-      className="transition-colors duration-200 hover:bg-slate-50 dark:hover:bg-slate-700/20"
+      className="transition-all duration-300 hover:-translate-y-px hover:bg-slate-50 hover:shadow-[inset_0_0_0_1px_rgba(148,163,184,0.18)] dark:hover:bg-slate-700/20"
       style={{ animation: `fadeIn 0.3s ease-out ${delay}s backwards` }}
     >
       <td className="whitespace-nowrap px-5 py-4 text-sm font-medium text-slate-900 dark:text-white">
@@ -116,7 +124,11 @@ function TransactionRow({ transaction, isAdmin, onDelete, delay }) {
       {isAdmin && (
         <td className="px-5 py-4">
           <div className="flex justify-center gap-2">
-            <ActionButton icon={<Edit2 size={18} />} title="Edit" />
+            <ActionButton
+              icon={<Edit2 size={18} />}
+              title="Edit"
+              onClick={() => onEdit(transaction.id)}
+            />
             <ActionButton
               icon={<Trash2 size={18} />}
               title="Delete"
@@ -141,7 +153,7 @@ function ActionButton({ icon, title, variant = 'default', onClick }) {
   return (
     <button
       onClick={onClick}
-      className={`rounded-lg p-2 transition-all duration-150 hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${variantClass}`}
+      className={`rounded-lg p-2 transition-all duration-300 hover:-translate-y-0.5 hover:scale-[1.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${variantClass}`}
       title={title}
       aria-label={title}
     >

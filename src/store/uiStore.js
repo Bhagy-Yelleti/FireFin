@@ -1,41 +1,39 @@
 import { create } from 'zustand';
 import { persist, devtools } from 'zustand/middleware';
 
-/**
- * UI Store - Manages all UI state and user preferences
- * Handles themes, navigation, user roles, and UI toggles
- */
 export const useUiStore = create(
   devtools(
     persist(
       (set) => ({
-        // User/Role Management
         role: 'viewer',
-
-        // Theme Management
         darkMode: false,
-
-        // Navigation State
         sidebarOpen: true,
         activeTab: 'dashboard',
+        transactionFormOpen: false,
+        editingTransactionId: null,
 
-        // Actions - Role Management
         setRole: (role) => set({ role }),
-
-        // Actions - Theme Management
         toggleDarkMode: () => set((state) => ({ darkMode: !state.darkMode })),
         setDarkMode: (isDark) => set({ darkMode: isDark }),
-
-        // Actions - Navigation
         toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
         setSidebarOpen: (isOpen) => set({ sidebarOpen: isOpen }),
         setActiveTab: (tab) => set({ activeTab: tab }),
 
-        // Computed selectors
-        isAdmin: () => {
-          const state = get();
-          return state.role === 'admin';
-        },
+        openAddTransaction: () =>
+          set({
+            transactionFormOpen: true,
+            editingTransactionId: null,
+          }),
+        openEditTransaction: (transactionId) =>
+          set({
+            transactionFormOpen: true,
+            editingTransactionId: transactionId,
+          }),
+        closeTransactionForm: () =>
+          set({
+            transactionFormOpen: false,
+            editingTransactionId: null,
+          }),
       }),
       {
         name: 'ui-store',

@@ -6,27 +6,23 @@ import {
   getSpendingByCategory as computeSpendingByCategory,
 } from '../utils/transactionHelpers';
 
-/**
- * Transaction Store - Manages all transaction-related state
- * Uses Zustand with devtools and persist middleware
- */
 export const useTransactionStore = create(
   devtools(
     persist(
       (set, get) => ({
-        // State
         transactions: [],
         searchQuery: '',
         filterCategory: null,
         sortBy: 'date-new',
 
-        // Actions - Core transaction operations
         addTransaction: (transactionData) => {
           const newTransaction = {
             id: Date.now().toString(),
             ...transactionData,
+            amount: Number(transactionData.amount),
             date: new Date(transactionData.date).toISOString(),
           };
+
           set((state) => ({
             transactions: [newTransaction, ...state.transactions],
           }));
@@ -35,7 +31,14 @@ export const useTransactionStore = create(
         updateTransaction: (id, updates) => {
           set((state) => ({
             transactions: state.transactions.map((t) =>
-              t.id === id ? { ...t, ...updates } : t
+              t.id === id
+                ? {
+                    ...t,
+                    ...updates,
+                    amount: Number(updates.amount ?? t.amount),
+                    date: updates.date ? new Date(updates.date).toISOString() : t.date,
+                  }
+                : t
             ),
           }));
         },
@@ -47,13 +50,10 @@ export const useTransactionStore = create(
         },
 
         setTransactions: (transactions) => set({ transactions }),
-
-        // Actions - Filter/Search operations
         setSearchQuery: (query) => set({ searchQuery: query }),
         setFilterCategory: (category) => set({ filterCategory: category }),
         setSortBy: (sortBy) => set({ sortBy }),
 
-        // Computed selectors
         getFilteredTransactions: () => {
           const state = get();
           return getFilteredAndSortedTransactions(
@@ -64,9 +64,7 @@ export const useTransactionStore = create(
           );
         },
 
-        getSummary: () => {
-          return calculateSummary(get().transactions);
-        },
+        getSummary: () => calculateSummary(get().transactions),
 
         getSpendingByCategory: () => {
           const spending = computeSpendingByCategory(get().transactions);
@@ -76,17 +74,10 @@ export const useTransactionStore = create(
           }));
         },
 
-        getTransactionById: (id) => {
-          return get().transactions.find((t) => t.id === id);
-        },
-
-        getTransactionsByType: (type) => {
-          return get().transactions.filter((t) => t.type === type);
-        },
-
-        getTransactionsByCategory: (category) => {
-          return get().transactions.filter((t) => t.category === category);
-        },
+        getTransactionById: (id) => get().transactions.find((t) => String(t.id) === String(id)),
+        getTransactionsByType: (type) => get().transactions.filter((t) => t.type === type),
+        getTransactionsByCategory: (category) =>
+          get().transactions.filter((t) => t.category === category),
       }),
       {
         name: 'transaction-store',
