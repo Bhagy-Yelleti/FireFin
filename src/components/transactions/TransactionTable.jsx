@@ -1,5 +1,5 @@
 import React from 'react';
-import { Edit2, Trash2 } from 'lucide-react';
+import { Edit2, SearchX, Trash2 } from 'lucide-react';
 import Card from '../common/Card';
 import Badge from '../common/Badge';
 import { useFilteredTransactions, useTransactionActions, useUserRole } from '../../hooks/useTransactions';
@@ -8,19 +8,44 @@ import { formatCurrency } from '../../utils/formatters';
 import { formatTransactionDate } from '../../utils/transactionHelpers';
 import { getTransactionTypeVariant } from '../../utils/uiHelpers';
 import EmptyState from '../common/EmptyState';
+import { SkeletonBlock } from '../common/Skeleton';
 
-export default function TransactionTable() {
+export default function TransactionTable({ isLoading = false }) {
   const { filtered } = useFilteredTransactions();
   const { isAdmin } = useUserRole();
   const { deleteTransaction } = useTransactionActions();
   const openEditTransaction = useUiStore((state) => state.openEditTransaction);
 
+  if (isLoading) {
+    return (
+      <Card className="animate-fadeIn overflow-hidden p-0">
+        <div className="overflow-x-auto">
+          <table className="min-w-[760px] w-full">
+            <TableHead isAdmin={isAdmin} />
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-700/50">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <tr key={index}>
+                  {Array.from({ length: isAdmin ? 6 : 5 }).map((_, cellIndex) => (
+                    <td key={cellIndex} className="px-5 py-4">
+                      <SkeletonBlock className="h-5 w-full max-w-[8rem]" />
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+    );
+  }
+
   if (filtered.length === 0) {
     return (
       <Card className="animate-fadeIn">
         <EmptyState
+          icon={SearchX}
           title="No transactions found"
-          description="Try adjusting search or filters."
+          description="Try changing filters or search query."
         />
       </Card>
     );

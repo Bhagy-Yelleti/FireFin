@@ -1,10 +1,12 @@
 import React, { useMemo } from 'react';
-import { AlertCircle, TrendingDown, TrendingUp } from 'lucide-react';
+import { AlertCircle, Lightbulb, TrendingDown, TrendingUp } from 'lucide-react';
 import { useTransactionStore } from '../../store/transactionStore';
 import Card from '../common/Card';
 import { formatCurrency } from '../../utils/formatters';
+import { SkeletonBlock, SkeletonText } from '../common/Skeleton';
+import EmptyState from '../common/EmptyState';
 
-export default function InsightsSection() {
+export default function InsightsSection({ isLoading = false }) {
   const transactions = useTransactionStore((state) => state.transactions);
 
   const insights = useMemo(() => {
@@ -64,13 +66,47 @@ export default function InsightsSection() {
     };
   }, [transactions]);
 
+  if (isLoading) {
+    return (
+      <div className="space-y-8">
+        <div className="space-y-3">
+          <SkeletonBlock className="h-10 w-72 max-w-full" />
+          <SkeletonBlock className="h-4 w-[32rem] max-w-full" />
+        </div>
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <Card key={index} className="h-full">
+              <SkeletonText lines={1} lineClassName="h-5" className="mb-4 max-w-[10rem]" />
+              <SkeletonText lines={4} lineClassName="h-4" />
+            </Card>
+          ))}
+        </div>
+        <Card>
+          <SkeletonText lines={1} lineClassName="h-5" className="mb-6 max-w-[12rem]" />
+          <div className="space-y-4">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div key={index}>
+                <div className="mb-2 flex items-center justify-between gap-4">
+                  <SkeletonBlock className="h-4 w-24" />
+                  <SkeletonBlock className="h-4 w-16" />
+                </div>
+                <SkeletonBlock className="h-2 w-full" />
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
   if (transactions.length === 0) {
     return (
       <Card>
-        <div className="py-12 text-center">
-          <AlertCircle className="mx-auto mb-4 h-12 w-12 text-slate-400 dark:text-slate-500" />
-          <p className="text-slate-500 dark:text-slate-400">Add transactions to view insights.</p>
-        </div>
+        <EmptyState
+          icon={Lightbulb}
+          title="No insights available yet"
+          description="Add a few transactions to unlock savings trends, category breakdowns, and smart tips."
+        />
       </Card>
     );
   }
@@ -87,7 +123,7 @@ export default function InsightsSection() {
       </div>
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-        <Card className="h-full">
+        <Card className="h-full transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
           <h3 className="mb-4 text-lg font-semibold text-slate-900 dark:text-white">Highest Spending</h3>
           {insights.highestCategory ? (
             <div>
@@ -112,11 +148,11 @@ export default function InsightsSection() {
               </div>
             </div>
           ) : (
-            <p className="text-sm text-slate-500 dark:text-slate-400">No expense data available.</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">No data available</p>
           )}
         </Card>
 
-        <Card className="h-full">
+        <Card className="h-full transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
           <h3 className="mb-4 text-lg font-semibold text-slate-900 dark:text-white">Spending Trend</h3>
           <div className="mb-4 flex flex-wrap items-start justify-between gap-4">
             <div>
@@ -142,7 +178,7 @@ export default function InsightsSection() {
           </p>
         </Card>
 
-        <Card className="h-full">
+        <Card className="h-full transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
           <h3 className="mb-4 text-lg font-semibold text-slate-900 dark:text-white">Savings Rate</h3>
           <div className="space-y-4">
             <div className="space-y-2">
@@ -182,7 +218,7 @@ export default function InsightsSection() {
           </div>
         </Card>
 
-        <Card className="h-full">
+        <Card className="h-full transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
           <h3 className="mb-4 text-lg font-semibold text-slate-900 dark:text-white">Smart Tips</h3>
           <div className="space-y-3">
             {insights.savingsRate < 20 && (
@@ -213,7 +249,7 @@ export default function InsightsSection() {
         </Card>
       </div>
 
-      <Card>
+      <Card className="transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
         <h3 className="mb-6 text-lg font-semibold text-slate-900 dark:text-white">Spending Breakdown</h3>
         <div className="space-y-4">
           {Object.entries(insights.categoryMap)
@@ -251,7 +287,7 @@ function TipCard({ tone, text }) {
   };
 
   return (
-    <div className={`rounded-xl border p-3 text-sm font-medium leading-6 ${toneClassMap[tone]}`}>
+    <div className={`rounded-xl border p-3 text-sm font-medium leading-6 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${toneClassMap[tone]}`}>
       {text}
     </div>
   );

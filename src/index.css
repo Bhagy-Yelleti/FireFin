@@ -61,11 +61,12 @@ select,
 textarea,
 a {
   transition:
-    background-color 0.2s ease,
-    color 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    transform 0.2s ease;
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease,
+    transform 0.3s ease,
+    opacity 0.3s ease;
 }
 
 ::selection {
@@ -150,6 +151,18 @@ html.dark ::-webkit-scrollbar-thumb:hover {
   }
 }
 
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .animate-fadeIn {
   animation: fadeIn 0.4s ease-out;
 }
@@ -164,4 +177,8 @@ html.dark ::-webkit-scrollbar-thumb:hover {
 
 .animate-scaleIn {
   animation: scaleIn 0.3s ease-out;
+}
+
+.animate-pageEnter {
+  animation: pageEnter 0.28s ease-out;
 }

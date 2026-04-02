@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Layout from './components/layout/Layout';
 import DashboardOverview from './components/dashboard/DashboardOverview';
 import TransactionForm from './components/transactions/TransactionForm';
@@ -16,6 +16,7 @@ export default function App() {
   const transactions = useTransactionStore((state) => state.transactions);
   const setTransactions = useTransactionStore((state) => state.setTransactions);
   const setActiveTab = useUiStore((state) => state.setActiveTab);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const storedDarkMode = localStorage.getItem('ui-store');
@@ -43,27 +44,34 @@ export default function App() {
     htmlElement.classList.toggle('dark', darkMode);
   }, [darkMode]);
 
+  useEffect(() => {
+    const timer = window.setTimeout(() => setIsLoading(false), 650);
+    return () => window.clearTimeout(timer);
+  }, []);
+
   return (
     <Layout>
-      {activeTab === 'dashboard' && (
-        <div className="space-y-6">
-          <DashboardOverview />
-        </div>
-      )}
+      <div key={activeTab} className="animate-pageEnter space-y-6">
+        {activeTab === 'dashboard' && (
+          <div className="space-y-6">
+            <DashboardOverview isLoading={isLoading} />
+          </div>
+        )}
 
-      {activeTab === 'transactions' && (
-        <div className="space-y-6">
-          <TransactionHeader />
-          <TransactionForm />
-          <TransactionTable />
-        </div>
-      )}
+        {activeTab === 'transactions' && (
+          <div className="space-y-6">
+            <TransactionHeader />
+            <TransactionForm />
+            <TransactionTable isLoading={isLoading} />
+          </div>
+        )}
 
-      {activeTab === 'insights' && (
-        <div className="space-y-6">
-          <InsightsSection />
-        </div>
-      )}
+        {activeTab === 'insights' && (
+          <div className="space-y-6">
+            <InsightsSection isLoading={isLoading} />
+          </div>
+        )}
+      </div>
     </Layout>
   );
 }

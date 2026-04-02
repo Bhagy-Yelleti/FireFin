@@ -10,6 +10,9 @@ import {
 } from 'recharts';
 import Card from '../common/Card';
 import { useUiStore } from '../../store/uiStore';
+import EmptyState from '../common/EmptyState';
+import { SkeletonBlock, SkeletonText } from '../common/Skeleton';
+import { BarChart3 } from 'lucide-react';
 
 const formatCompactCurrency = (value) =>
   new Intl.NumberFormat('en-IN', {
@@ -24,7 +27,7 @@ const formatFullCurrency = (value) =>
     maximumFractionDigits: 0,
   }).format(value);
 
-export default function BalanceTrendChart() {
+export default function BalanceTrendChart({ isLoading = false }) {
   const darkMode = useUiStore((state) => state.darkMode);
 
   const generateTrendData = () => {
@@ -55,7 +58,7 @@ export default function BalanceTrendChart() {
   };
 
   return (
-    <Card className="animate-slideUp h-full">
+    <Card className="animate-slideUp h-full transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
       <div className="mb-6 flex items-start justify-between gap-4">
         <div>
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Balance Trend</h3>
@@ -69,55 +72,73 @@ export default function BalanceTrendChart() {
       </div>
 
       <div className="h-[360px] min-w-0 sm:h-[400px]">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart
-            data={data}
-            margin={{ top: 20, right: 24, bottom: 20, left: 8 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} opacity={0.6} />
-            <XAxis
-              dataKey="month"
-              stroke={axisStroke}
-              tickLine={false}
-              axisLine={false}
-              tick={{ fill: axisStroke, fontSize: 12 }}
-              interval={0}
-              padding={{ left: 8, right: 8 }}
-            />
-            <YAxis
-              stroke={axisStroke}
-              tickLine={false}
-              axisLine={false}
-              tick={{ fill: axisStroke, fontSize: 12 }}
-              width={84}
-              tickFormatter={formatCompactCurrency}
-            />
-            <Tooltip
-              contentStyle={tooltipStyle}
-              itemStyle={{ color: darkMode ? '#0f172a' : '#ffffff', paddingTop: 4 }}
-              labelStyle={{
-                color: darkMode ? '#0f172a' : '#ffffff',
-                fontWeight: 700,
-                marginBottom: 4,
-              }}
-              formatter={(value) => [formatFullCurrency(value), 'Balance']}
-              wrapperStyle={{ outline: 'none', zIndex: 20 }}
-              cursor={{
-                strokeDasharray: '5 5',
-                stroke: '#3b82f6',
-                opacity: 0.7,
-              }}
-            />
-            <Line
-              type="monotone"
-              dataKey="balance"
-              stroke="#3b82f6"
-              strokeWidth={3}
-              dot={{ fill: '#3b82f6', r: 4, strokeWidth: 0 }}
-              activeDot={{ r: 6, fill: '#1d4ed8', stroke: darkMode ? '#ffffff' : '#0f172a', strokeWidth: 2 }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
+        {isLoading ? (
+          <div className="flex h-full flex-col justify-between rounded-2xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-900/50">
+            <SkeletonText lines={2} lineClassName="h-4" className="max-w-xs" />
+            <SkeletonBlock className="h-52 w-full rounded-3xl" />
+            <div className="grid grid-cols-6 gap-2">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <SkeletonBlock key={index} className="h-3" />
+              ))}
+            </div>
+          </div>
+        ) : data.length === 0 ? (
+          <EmptyState
+            icon={BarChart3}
+            title="No data available"
+            description="No balance data is available for this chart yet."
+          />
+        ) : (
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart
+              data={data}
+              margin={{ top: 20, right: 24, bottom: 20, left: 8 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} opacity={0.6} />
+              <XAxis
+                dataKey="month"
+                stroke={axisStroke}
+                tickLine={false}
+                axisLine={false}
+                tick={{ fill: axisStroke, fontSize: 12 }}
+                interval={0}
+                padding={{ left: 8, right: 8 }}
+              />
+              <YAxis
+                stroke={axisStroke}
+                tickLine={false}
+                axisLine={false}
+                tick={{ fill: axisStroke, fontSize: 12 }}
+                width={84}
+                tickFormatter={formatCompactCurrency}
+              />
+              <Tooltip
+                contentStyle={tooltipStyle}
+                itemStyle={{ color: darkMode ? '#0f172a' : '#ffffff', paddingTop: 4 }}
+                labelStyle={{
+                  color: darkMode ? '#0f172a' : '#ffffff',
+                  fontWeight: 700,
+                  marginBottom: 4,
+                }}
+                formatter={(value) => [formatFullCurrency(value), 'Balance']}
+                wrapperStyle={{ outline: 'none', zIndex: 20 }}
+                cursor={{
+                  strokeDasharray: '5 5',
+                  stroke: '#3b82f6',
+                  opacity: 0.7,
+                }}
+              />
+              <Line
+                type="monotone"
+                dataKey="balance"
+                stroke="#3b82f6"
+                strokeWidth={3}
+                dot={{ fill: '#3b82f6', r: 4, strokeWidth: 0 }}
+                activeDot={{ r: 6, fill: '#1d4ed8', stroke: darkMode ? '#ffffff' : '#0f172a', strokeWidth: 2 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        )}
       </div>
     </Card>
   );
