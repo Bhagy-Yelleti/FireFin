@@ -5,6 +5,7 @@ FireFin is a responsive personal finance dashboard built with React, Vite, Tailw
 ## Live Demo
 
 - App: https://firefin.vercel.app
+- Auto-deploy: GitHub pushes to the connected Vercel project update the app automatically
 
 ## Core Features
 
