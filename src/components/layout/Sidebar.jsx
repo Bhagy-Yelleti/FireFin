@@ -14,19 +14,21 @@ export default function Sidebar({ isOpen, onClose }) {
 
   return (
     <>
-      {isOpen && (
-        <div
-          className="fixed inset-0 z-30 bg-slate-950/50 backdrop-blur-sm lg:hidden"
-          onClick={onClose}
-        />
-      )}
+      <div
+        className={`fixed inset-0 z-30 bg-slate-950/50 backdrop-blur-sm transition-opacity duration-300 lg:hidden ${
+          isOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
+        }`}
+        onClick={onClose}
+        aria-hidden="true"
+      />
 
       <aside
-        className={`fixed left-0 top-0 z-40 flex h-screen w-72 flex-col border-r border-slate-200/80 bg-white/95 shadow-2xl backdrop-blur transition-transform duration-300 dark:border-slate-700/70 dark:bg-slate-800/95 lg:sticky lg:top-0 lg:z-20 lg:shadow-none ${
+        aria-label="Sidebar navigation"
+        className={`fixed left-0 top-0 z-40 flex h-screen w-[min(18rem,85vw)] flex-col border-r border-slate-200/80 bg-white/95 shadow-2xl backdrop-blur transition-transform duration-300 dark:border-slate-700/70 dark:bg-slate-800/95 lg:sticky lg:top-0 lg:z-20 lg:w-72 lg:shadow-none ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         } lg:translate-x-0`}
       >
-        <div className="flex items-center justify-between border-b border-slate-200/80 px-6 py-5 dark:border-slate-700/70">
+        <div className="flex items-center justify-between border-b border-slate-200/80 px-5 py-5 dark:border-slate-700/70 sm:px-6">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 via-cyan-500 to-blue-700 shadow-lg shadow-blue-500/20">
               <span className="text-sm font-bold text-white">FF</span>
@@ -39,7 +41,7 @@ export default function Sidebar({ isOpen, onClose }) {
 
           <button
             onClick={onClose}
-            className="rounded-xl p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 lg:hidden dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-white"
+            className="rounded-xl p-2 text-slate-500 transition-all duration-300 hover:scale-[1.03] hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 lg:hidden dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-white"
             aria-label="Close navigation menu"
           >
             <X size={18} />
@@ -58,10 +60,10 @@ export default function Sidebar({ isOpen, onClose }) {
                   setActiveTab(item.id);
                   onClose();
                 }}
-                className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+                className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-semibold transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
                   isActive
-                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25 hover:bg-blue-700'
-                    : 'text-slate-700 hover:translate-x-0.5 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-700/70 dark:hover:text-white'
+                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25 hover:-translate-y-0.5 hover:bg-blue-700'
+                    : 'text-slate-700 hover:translate-x-1 hover:-translate-y-0.5 hover:bg-slate-100 hover:text-slate-900 hover:shadow-md dark:text-slate-300 dark:hover:bg-slate-700/70 dark:hover:text-white'
                 }`}
               >
                 <Icon size={18} className={`flex-shrink-0 ${isActive ? 'text-white' : 'text-slate-500 dark:text-slate-400'}`} />

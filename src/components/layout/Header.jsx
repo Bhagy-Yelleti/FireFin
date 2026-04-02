@@ -3,13 +3,31 @@ import { Menu, Moon, Sun } from 'lucide-react';
 import { useUiStore } from '../../store/uiStore';
 
 const controlClassName =
-  'rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-900 shadow-sm transition-all duration-200 hover:border-slate-300 hover:bg-slate-50 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:hover:border-slate-500 dark:hover:bg-slate-600 dark:focus-visible:ring-offset-slate-800';
+  'rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-900 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:hover:border-slate-500 dark:hover:bg-slate-600 dark:focus-visible:ring-offset-slate-800';
 
 export default function Header({ onMenuClick }) {
   const darkMode = useUiStore((state) => state.darkMode);
   const toggleDarkMode = useUiStore((state) => state.toggleDarkMode);
   const role = useUiStore((state) => state.role);
   const setRole = useUiStore((state) => state.setRole);
+  const addToast = useUiStore((state) => state.addToast);
+
+  const handleThemeToggle = () => {
+    const nextDarkMode = !darkMode;
+    toggleDarkMode();
+    addToast({
+      title: nextDarkMode ? 'Dark mode enabled' : 'Light mode enabled',
+      description: 'Theme updated successfully.',
+    });
+  };
+
+  const handleRoleChange = (nextRole) => {
+    setRole(nextRole);
+    addToast({
+      title: `Role switched to ${nextRole === 'admin' ? 'Admin' : 'Viewer'}`,
+      description: 'Permissions have been updated for this session.',
+    });
+  };
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/95 shadow-sm backdrop-blur dark:border-slate-700/70 dark:bg-slate-800/95">
@@ -17,8 +35,9 @@ export default function Header({ onMenuClick }) {
         <div className="flex min-w-0 items-center gap-3 sm:gap-4">
           <button
             onClick={onMenuClick}
-            className="rounded-xl p-2 text-slate-600 transition-all duration-200 hover:scale-[1.03] hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 lg:hidden dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white"
+            className="rounded-xl p-2 text-slate-600 transition-all duration-300 hover:scale-[1.03] hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 lg:hidden dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white"
             aria-label="Open navigation menu"
+            aria-expanded="false"
           >
             <Menu size={22} />
           </button>
@@ -33,7 +52,7 @@ export default function Header({ onMenuClick }) {
         <div className="flex items-center gap-2.5">
           <select
             value={role}
-            onChange={(e) => setRole(e.target.value)}
+            onChange={(e) => handleRoleChange(e.target.value)}
             className={controlClassName}
             aria-label="Select user role"
           >
@@ -42,8 +61,8 @@ export default function Header({ onMenuClick }) {
           </select>
 
           <button
-            onClick={toggleDarkMode}
-            className="group relative rounded-xl border border-slate-200 bg-white p-2.5 text-slate-700 shadow-sm transition-all duration-200 hover:scale-[1.03] hover:border-slate-300 hover:bg-slate-50 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:bg-slate-600 dark:focus-visible:ring-offset-slate-800"
+            onClick={handleThemeToggle}
+            className="group relative rounded-xl border border-slate-200 bg-white p-2.5 text-slate-700 shadow-sm transition-all duration-300 hover:scale-[1.03] hover:border-slate-300 hover:bg-slate-50 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:bg-slate-600 dark:focus-visible:ring-offset-slate-800"
             title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
             aria-label="Toggle dark mode"
           >

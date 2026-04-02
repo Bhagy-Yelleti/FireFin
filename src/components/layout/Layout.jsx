@@ -1,13 +1,18 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Header from './Header';
 import Sidebar from './Sidebar';
+import Footer from './Footer';
+import ToastViewport from '../common/ToastViewport';
+import { useUiStore } from '../../store/uiStore';
 
 export default function Layout({ children }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const sidebarOpen = useUiStore((state) => state.sidebarOpen);
+  const setSidebarOpen = useUiStore((state) => state.setSidebarOpen);
 
   return (
     <div className="flex min-h-screen bg-slate-50 text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-white">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <ToastViewport />
 
       <div className="flex min-w-0 flex-1 flex-col">
         <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
@@ -17,6 +22,7 @@ export default function Layout({ children }) {
             {children}
           </div>
         </main>
+        <Footer />
       </div>
     </div>
   );

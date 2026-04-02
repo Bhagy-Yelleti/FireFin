@@ -21,6 +21,7 @@ export default function TransactionForm() {
   const isOpen = useUiStore((state) => state.transactionFormOpen);
   const editingTransactionId = useUiStore((state) => state.editingTransactionId);
   const closeTransactionForm = useUiStore((state) => state.closeTransactionForm);
+  const addToast = useUiStore((state) => state.addToast);
   const addTransaction = useTransactionStore((state) => state.addTransaction);
   const updateTransaction = useTransactionStore((state) => state.updateTransaction);
   const getTransactionById = useTransactionStore((state) => state.getTransactionById);
@@ -79,8 +80,16 @@ export default function TransactionForm() {
 
     if (isEditMode) {
       updateTransaction(editingTransaction.id, payload);
+      addToast({
+        title: 'Transaction edited successfully',
+        description: 'The updated details are now reflected across FireFin.',
+      });
     } else {
       addTransaction(payload);
+      addToast({
+        title: 'Transaction added successfully',
+        description: 'The new transaction was added to your dashboard.',
+      });
     }
 
     closeTransactionForm();

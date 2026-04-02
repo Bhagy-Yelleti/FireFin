@@ -15,6 +15,7 @@ export default function TransactionTable({ isLoading = false }) {
   const { isAdmin } = useUserRole();
   const { deleteTransaction } = useTransactionActions();
   const openEditTransaction = useUiStore((state) => state.openEditTransaction);
+  const addToast = useUiStore((state) => state.addToast);
 
   if (isLoading) {
     return (
@@ -158,7 +159,13 @@ function TransactionRow({ transaction, isAdmin, onDelete, onEdit, delay }) {
               icon={<Trash2 size={18} />}
               title="Delete"
               variant="danger"
-              onClick={() => onDelete(transaction.id)}
+              onClick={() => {
+                onDelete(transaction.id);
+                addToast({
+                  title: 'Transaction deleted successfully',
+                  description: 'The transaction has been removed.',
+                });
+              }}
             />
           </div>
         </td>

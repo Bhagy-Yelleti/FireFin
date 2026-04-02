@@ -15,10 +15,14 @@ export default function TransactionHeader() {
   const transactions = useTransactionStore((state) => state.transactions);
   const role = useUiStore((state) => state.role);
   const openAddTransaction = useUiStore((state) => state.openAddTransaction);
+  const addToast = useUiStore((state) => state.addToast);
 
   const handleExportCSV = () => {
     if (transactions.length === 0) {
-      alert('No transactions to export');
+      addToast({
+        title: 'No transactions to export',
+        description: 'Add or restore transactions before exporting CSV.',
+      });
       return;
     }
 
@@ -39,6 +43,10 @@ export default function TransactionHeader() {
     a.download = 'transactions.csv';
     a.click();
     window.URL.revokeObjectURL(url);
+    addToast({
+      title: 'CSV exported successfully',
+      description: 'Your transactions were exported successfully.',
+    });
   };
 
   return (
